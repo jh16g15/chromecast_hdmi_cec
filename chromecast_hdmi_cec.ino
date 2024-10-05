@@ -2,7 +2,7 @@
 #include <IRremote.hpp>
 #include "AK59-00149A_codes.h"
 
-#define IR_RECEIVE_PIN 2 // To be compatible with interrupt example, pin 2 is chosen here.
+#define IR_RECEIVE_PIN 7
 
 /*
  * Helper macro for getting a macro definition as string
@@ -12,7 +12,7 @@
 #define STR(x) STR_HELPER(x)
 #endif
 
-// Based on SimpleReceiver.ino Example from IRremote library 4.4.1
+// Based on SimpleReceiveForHashCodes.ino Example from IRremote library 4.4.1
 
 void setup() {
   Serial.begin(115200);
@@ -25,8 +25,12 @@ void setup() {
 }
 
 void loop() {
-  if (IrReceiver.decode()) {
+  // Check if we have received new IR data
+  if (IrReceiver.available()) {
+    IrReceiver.initDecodedIRData();
+    IrReceiver.decodeHash();
     IrReceiver.resume(); // Early enable receiving of the next IR frame
+    
     Serial.println("Result Short:");
     IrReceiver.printIRResultShort(&Serial);
     // Serial.println("How to Send:");
@@ -42,11 +46,8 @@ void loop() {
       case AK59_00149A_PAUSE:
         Serial.println("Pause");
         break;
-      case AK59_00149A_FORWARD:
-        Serial.println("Forward");
-        break;
-      case AK59_00149A_BACKWARD:
-        Serial.println("Backward");
+      case AK59_00149A_STOP:
+        Serial.println("Stop");
         break;
         
     }
